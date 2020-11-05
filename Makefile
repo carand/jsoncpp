@@ -1,13 +1,13 @@
 CMAKE = cmake
 #Switch to activatad Build Type
-BUILD_TYPE=Debug
+BUILD_TYPE=Release
 # BUILD_TYPE=Release
 # BUILD_TYPE=RelWithDebInfo
 # BUILD_TYPE=MinSizeRel
 
-DEFAULT_RUN_ARGS= " "
+DEFAULT_RUN_ARGS= " -vf"
+RELEASE_DIR=./INSTALL_DIR
 
-RELEASE_DIR=/home/cmd/repos/cpp/jsoncpp/myrelease
 DAFUR_DIR=/dafur
 SRC_DIR=./src
 INC_DIR=./include
@@ -20,6 +20,8 @@ APP_NAME=jsoncpp
 APP_TEST=unittests_$(APP_NAME)
 
 
+MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+MKFILE_DIR := $(dir $(MKFILE_PATH))
 SPELLGEN=./support/generateSpellingListFromCTags.py
 SPELLFILE=$(APP_NAME)FromTags
 # TEST_APP_NAME=rfidTestApp
@@ -34,6 +36,14 @@ BUILD_TOOL = "Unix Makefiles"
 
 default: $(APP_NAME)
 
+CMAKE_DEV_OPTIONS :=  \
+	-DCMAKE_CXX_FLAGS=-m32
+
+
+
+CMAKE_RELEASE_OPTIONS :=  \
+	-DCMAKE_CXX_FLAGS=-m32
+
 release:
 	$(CMAKE) -H. -BRelease -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles"  \
 	-DCMAKE_CXX_FLAGS=-m32 \
@@ -41,6 +51,14 @@ release:
 	$(MAKE) -C Release all
 
 
+sanitize:
+	$(CMAKE) -H. -B$(CMAKE_BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -G $(BUILD_TOOL) \
+	$(CMAKE_DEV_OPTIONS) \
+    -DCMAKE_CXX_FLAGS="-fsanitize=address  -fsanitize=leak -g" \
+    -DCMAKE_C_FLAGS="-fsanitize=address  -fsanitize=leak -g" \
+    -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address  -fsanitize=leak" \
+	-DCMAKE_MODULE_LINKER_FLAGS="-fsanitize=address  -fsanitize=leak"
+	$(MAKE) -C $(CMAKE_BUILD_DIR) $(APP_NAME)
 debug:
 	$(CMAKE) -H. -BRelease -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles"  \
 	-DCMAKE_CXX_FLAGS=-m32 \
@@ -79,7 +97,7 @@ $(APP_NAME): | $(CMAKE_BUILD_DIR)
 ##
 
 .PHONY: clean
-clean: clean_spell
+clean:
 	$(RM) -r tags
 	$(RM) -r cscope.out
 	cd $(CMAKE_BUILD_DIR) &&  $(MAKE) clean $(ARGS); cd ..
