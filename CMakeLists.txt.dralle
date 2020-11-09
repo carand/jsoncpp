@@ -1,0 +1,38 @@
+# vim: set filetype=cmake
+# vim: set syntax=cmake
+
+option(BUILD_32 "Build 32 bit" ON)
+
+
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_SYSTEM_VERSION gnu)
+if (BUILD_32)
+  set_target_properties(${APP_NAME} PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
+  MESSAGE(STATUS "Excluding 64bit library paths from search.")
+  set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS OFF)
+  set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB32_PATHS ON)
+  set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIBX32_PATHS ON)
+  set(CMAKE_LIBRARY_PATH "/usr/lib/i386-linux-gnu" CACHE PATH "<desc>")
+  set(CMAKE_SYSTEM_PROCESSOR i386)
+  set(CMAKE_SIZEOF_VOID_P 4)
+  set(ARCH i386)
+elseif (BUILD_64)
+  set_target_properties(${APP_NAME} PROPERTIES COMPILE_FLAGS
+    "-m64" LINK_FLAGS "-m64")
+  set(ARCH amd64)
+else()
+  set(ARCH amd64)
+endif()
+
+
+set(APP_NAME "jsoncpp")
+set(APP_EMAIL "info@website.de")
+set(APP_VENDOR "drallesystem")
+set(APP_DESCRIPTION "Bibliothek zum lesen und schreiben von Json Files")
+
+
+
+set(APP_VERSION_MAJOR 1) # will be increased on incompatible changes
+set(APP_VERSION_MINOR 9) # will be increased on new features in backwards compatible manner
+set(APP_VERSION_PATCH 4) # will be increased on bugfixes
+

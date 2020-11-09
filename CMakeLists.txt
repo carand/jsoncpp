@@ -62,21 +62,21 @@ if(CCACHE_EXECUTABLE)
 endif()
 
 project(jsoncpp
-        # Note: version must be updated in three places when doing a release. This
-        # annoying process ensures that amalgamate, CMake, and meson all report the
-        # correct version.
-        # 1. ./meson.build
-        # 2. ./include/json/version.h
-        # 3. ./CMakeLists.txt
-        # IMPORTANT: also update the PROJECT_SOVERSION!!
-        VERSION 1.9.4 # <major>[.<minor>[.<patch>[.<tweak>]]]
-        LANGUAGES CXX)
+    # Note: version must be updated in three places when doing a release. This
+    # annoying process ensures that amalgamate, CMake, and meson all report the
+    # correct version.
+    # 1. ./meson.build
+    # 2. ./include/json/version.h
+    # 3. ./CMakeLists.txt
+    # IMPORTANT: also update the PROJECT_SOVERSION!!
+    VERSION 1.9.4 # <major>[.<minor>[.<patch>[.<tweak>]]]
+    LANGUAGES CXX)
 
 message(STATUS "JsonCpp Version: ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 set(PROJECT_SOVERSION 24)
 
-option(JSONCPP_WITH_TESTS "Compile and (for jsoncpp_check) run JsonCpp test executables" ON)
-option(JSONCPP_WITH_POST_BUILD_UNITTEST "Automatically run unit-tests as a post build step" ON)
+option(JSONCPP_WITH_TESTS "Compile and (for jsoncpp_check) run JsonCpp test executables" OFF)
+option(JSONCPP_WITH_POST_BUILD_UNITTEST "Automatically run unit-tests as a post build step" OFF)
 option(JSONCPP_WITH_WARNING_AS_ERROR "Force compilation to fail if a warning occurs" OFF)
 option(JSONCPP_WITH_STRICT_ISO "Issue all the warnings demanded by strict ISO C and ISO C++" ON)
 option(JSONCPP_WITH_PKGCONFIG_SUPPORT "Generate and install .pc files" ON)
@@ -180,6 +180,7 @@ if(JSONCPP_WITH_TESTS)
     include(CTest)
 endif()
 
+include (CMakeLists.txt.dralle)
 # Build the different applications
 add_subdirectory(src)
 
@@ -190,3 +191,4 @@ add_subdirectory(include)
 if(JSONCPP_WITH_EXAMPLE)
     add_subdirectory(example)
 endif()
+include (CMakeLists.txt.mkpack)

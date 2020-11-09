@@ -37,12 +37,12 @@ BUILD_TOOL = "Unix Makefiles"
 default: $(APP_NAME)
 
 CMAKE_DEV_OPTIONS :=  \
-	-DCMAKE_CXX_FLAGS=-m32
+	-DBUILD_32=ON
 
 
 
 CMAKE_RELEASE_OPTIONS :=  \
-	-DCMAKE_CXX_FLAGS=-m32
+	-DBUILD_32=ON
 
 release:
 	$(CMAKE) -H. -BRelease -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles"  \
@@ -61,20 +61,20 @@ sanitize:
 	$(MAKE) -C $(CMAKE_BUILD_DIR) $(APP_NAME)
 debug:
 	$(CMAKE) -H. -BRelease -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles"  \
-	-DCMAKE_CXX_FLAGS=-m32 \
+	$(CMAKE_DEV_OPTIONS) \
 	$(MAKE) -C build $(APP_NAME)
 
 
 codeblocks_debug:
 	$(CMAKE) -H. -BCodeblocksDebug -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles"  \
-	-DCMAKE_CXX_FLAGS=-m32 \
+	$(CMAKE_DEV_OPTIONS) \
 	$(MAKE) -C CodeblocksDebug $(APP_NAME)
 	$(MAKE) -C CodeblocksDebug doc
 
 
 codeblocks_release:
 	$(CMAKE) -H. -BCodeblocksRelease -DCMAKE_BUILD_TYPE=Release -G "CodeBlocks - Unix Makefiles"  \
-	-DCMAKE_CXX_FLAGS=-m32 \
+	$(CMAKE_RELEASE_OPTIONS) \
 	$(MAKE) -C CodeblocksRelease $(APP_NAME)
 	$(MAKE) -C CodeblocksRelease doc
 
@@ -88,6 +88,12 @@ debug:
 
 
 $(CMAKE_BUILD_DIR): generate_build_tool
+
+
+generate_build_tool:
+	$(CMAKE) -H. -B$(CMAKE_BUILD_DIR) -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -G $(BUILD_TOOL) \
+	$(CMAKE_DEV_OPTIONS)
+
 
 $(APP_NAME): | $(CMAKE_BUILD_DIR)
 	$(MAKE) -C $(CMAKE_BUILD_DIR)
@@ -156,9 +162,13 @@ $(compile_commands): $(APP_NAME) | $(CMAKE_BUILD_DIR)
 	$(MAKE) -C $(CMAKE_BUILD_DIR) $(APP_NAME)
 
 
-generate_build_tool:
-	$(CMAKE) -H. -B$(CMAKE_BUILD_DIR) -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -G $(BUILD_TOOL) \
-	-DCMAKE_CXX_FLAGS=-m32
+install_package: release
+	mkdir -p $(RELEASE_DIR)
+	cd Release && $(MAKE) package &&  cp *.deb $(RELEASE_DIR) && cd ..
+
+install_release: release
+	mkdir -p $(RELEASE_DIR)
+	cd Release && $(MAKE) install && cd ..
 
 install_global:|
 	$(MAKE) $(APP_NAME)
@@ -193,6 +203,8 @@ genspell: docs tags | $(CMAKE_BUILD_DIR)
 clean_spell:
 	python $(SPELLGEN) -o ~/.vim/spell --clear $(SPELLFILE)
 
+pack:
+	@($(MAKE) -C $(CMAKE_BUILD_DIR) package)
 
 rtags: compile_commands
 	rc -J $(compile_commands)
