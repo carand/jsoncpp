@@ -37,11 +37,13 @@ BUILD_TOOL = "Unix Makefiles"
 default: $(APP_NAME)
 
 CMAKE_DEV_OPTIONS :=  \
+	-DCMAKE_CXX_FLAGS=-m32 \
 	-DBUILD_32=ON
 
 
 
 CMAKE_RELEASE_OPTIONS :=  \
+	-DCMAKE_CXX_FLAGS=-m32 \
 	-DBUILD_32=ON
 
 release:
