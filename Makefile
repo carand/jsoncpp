@@ -164,7 +164,7 @@ $(compile_commands): $(APP_NAME) | $(CMAKE_BUILD_DIR)
 	$(MAKE) -C $(CMAKE_BUILD_DIR) $(APP_NAME)
 
 
-install_package:
+install_package: | $(APP_NAME)
 	mkdir -p $(RELEASE_DIR)
 	cd $(CMAKE_BUILD_DIR) && $(MAKE) package &&  cp *.deb $(RELEASE_DIR) && cd ..
 
