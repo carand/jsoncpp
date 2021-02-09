@@ -15,12 +15,11 @@ SET(CPACK_PACKAGE_VERSION_PATCH "${APP_VERSION_PATCH}")
 string(TIMESTAMP STAMP "%Y%m%d+%H%M%S")
 
 set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-0+${STAMP}")
-set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-0+${STAMP}")
 # place our package in opt
-set(CPACK_PACKACKAGING_INSTALL_PREFIX "/opt/${APP_NAME}")
+# set(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local/${APP_NAME}")
+set(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local/")
 # ignore some folders and files, when generatin source package
-set(CPACK_SOURCE_IGNORE_FILES "${PROJECT_BINARY_DIR}; /.git; /.gitignore")
-
+set(CPACK_SOURCE_IGNORE_FILES "${PROJECT_BINARY_DIR};/\.git/;\.swp$;\.#;/#;.*~;cscope.*;\.gitignore;\.gdb_history;\.nvimlog;tags$;/INSTALL_DIR/;/3rdparty/")
 # if architecture is already set (e.g. to "all"), this is not needed
 # add ~distribution-codename (e.g. ~trusty or ~xenial) to end of package version
 # if lsb_release is available, take it from there or fall back to DISTRO_CODENAME env variable
@@ -69,6 +68,19 @@ else()
 endif()
 # autogenerate dependency information
 set (CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
+
+
+# if (${CPACK_GENERATOR} STREQUAL "TGZ")
+
+#     set(CPACK_SET_DESTDIR OFF)
+#     set(CMAKE_INSTALL_RPATH ".")
+#     set_target_properties(${APP_NAME}
+#         PROPERTIES INSTALL_RPATH ".")
+# elseif (${CPACK_GENERATOR} STREQUAL "DEB")
+# set(CPACK_SET_DESTDIR ON)
+# set(CMAKE_INSTALL_RPATH "/usr/local/${APP_NAME}")
+# set_target_properties(${APP_NAME}
+# PROPERTIES INSTALL_RPATH "/usr/local/${APP_NAME}")
+# endif ()
 
 include(CPack)

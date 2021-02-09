@@ -26,8 +26,8 @@ endif()
 
 
 set(APP_NAME "jsoncpp")
-set(APP_EMAIL "info@website.de")
-set(APP_VENDOR "drallesystem")
+set(APP_EMAIL "https://github.com/open-source-parsers/jsoncpp")
+set(APP_VENDOR "https://github.com/open-source-parsers/jsoncpp")
 set(APP_DESCRIPTION "Bibliothek zum lesen und schreiben von Json Files")
 
 

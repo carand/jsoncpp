@@ -6,7 +6,8 @@ BUILD_TYPE=Release
 # BUILD_TYPE=MinSizeRel
 
 DEFAULT_RUN_ARGS= " -vf"
-RELEASE_DIR=./INSTALL_DIR
+CURDIR=$(shell pwd)
+RELEASE_DIR=$(CURDIR)/INSTALL_DIR
 
 DAFUR_DIR=/dafur
 SRC_DIR=./src
@@ -53,14 +54,6 @@ release:
 	$(MAKE) -C Release all
 
 
-sanitize:
-	$(CMAKE) -H. -B$(CMAKE_BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug -G $(BUILD_TOOL) \
-	$(CMAKE_DEV_OPTIONS) \
-    -DCMAKE_CXX_FLAGS="-fsanitize=address  -fsanitize=leak -g" \
-    -DCMAKE_C_FLAGS="-fsanitize=address  -fsanitize=leak -g" \
-    -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address  -fsanitize=leak" \
-	-DCMAKE_MODULE_LINKER_FLAGS="-fsanitize=address  -fsanitize=leak"
-	$(MAKE) -C $(CMAKE_BUILD_DIR) $(APP_NAME)
 debug:
 	$(CMAKE) -H. -BRelease -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles"  \
 	$(CMAKE_DEV_OPTIONS) \
@@ -79,14 +72,6 @@ codeblocks_release:
 	$(CMAKE_RELEASE_OPTIONS) \
 	$(MAKE) -C CodeblocksRelease $(APP_NAME)
 	$(MAKE) -C CodeblocksRelease doc
-
-debug:
-	$(CMAKE) -H. -BDebug -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles"  \
-	-DCMAKE_CXX_FLAGS=-m32 \
-	$(MAKE) -C Debug $(APP_NAME)
-	$(MAKE) -C Debug doc
-
-
 
 
 $(CMAKE_BUILD_DIR): generate_build_tool
@@ -121,35 +106,6 @@ build: generate_build_tool
 	# $(CMAKE) --build $(CMAKE_BUILD_DIR)
 	# $(MAKE) all
 
-run: $(APP_NAME)
-ifeq ($(ARGS),)
-	$(MAKE) ARGS=$(DEFAULT_RUN_ARGS) run
-else
-	@( $(MAKE) -C  $(CMAKE_BUILD_DIR) link_target  )
-	cd $(DAFUR_DIR) &&  ./$(APP_NAME) $(ARGS); cd ..
-endif
-
-gdb_run:
-ifeq ($(ARGS),)
-	$(MAKE) ARGS=$(DEFAULT_RUN_ARGS) gdb_run
-else
-	@( $(MAKE) -C  $(CMAKE_BUILD_DIR) link_target  )
-	cd $(DAFUR_DIR) && tgdb --args $(APP_NAME) $(ARGS); cd ..
-	# cd $(DAFUR_DIR) && gdb --args $(APP_NAME) $(ARGS); cd ..
-endif
-
-memcheck: $(APP_NAME)
-ifeq ($(ARGS),)
-	$(MAKE) ARGS=$(DEFAULT_RUN_ARGS) memcheck
-else
-	@( $(MAKE) -C  $(CMAKE_BUILD_DIR) link_target  )
-	# cd $(DAFUR_DIR) && valgrind --leak-check=full  --track-origins=yes -v ./$(APP_NAME) $(ARGS); cd ..
-	# cd $(DAFUR_DIR) && valgrind --leak-check=full -v ./$(APP_NAME) $(ARGS); cd ..
-	cd $(DAFUR_DIR) && valgrind --leak-check=full --show-leak-kinds=all -v ./$(APP_NAME) $(ARGS); cd ..
-endif
-
-memcheck_test: $(APP_TEST)
-	cd $(CMAKE_BUILD_DIR) &&  valgrind --leak-check=full -v ./$(APP_TEST); cd ..
 
 cppcheck:
 	cppcheck --project=build/compile_commands.json --enable=all
@@ -167,6 +123,7 @@ $(compile_commands): $(APP_NAME) | $(CMAKE_BUILD_DIR)
 install_package: | $(APP_NAME)
 	mkdir -p $(RELEASE_DIR)
 	cd $(CMAKE_BUILD_DIR) && $(MAKE) package &&  cp *.deb $(RELEASE_DIR) && cd ..
+	cd $(CMAKE_BUILD_DIR) && $(MAKE) package_source &&  cp *-Source.tar.gz $(RELEASE_DIR) && cd ..
 
 install_release: release
 	mkdir -p $(RELEASE_DIR)
@@ -176,9 +133,6 @@ install_global:|
 	$(MAKE) $(APP_NAME)
 	cd ${CMAKE_BUILD_DIR} && sudo $(MAKE) install && cd ..
 
-install_release: distclean release
-	mkdir -p $(RELEASE_DIR)
-	cd Release && $(MAKE) install && cd ..
 
 uninstall_global:|
 	cd ${CMAKE_BUILD_DIR} && sudo $(MAKE) uninstall && cd ..
@@ -214,7 +168,7 @@ rtags: compile_commands
 
 .PHONY: distclean
 distclean:  clean
-	$(RM) -r $(CMAKE_BUILD_DIR)
+	$(RM) -fr $(RELEASE_DIR)
 	$(RM) -r Release
 	$(RM) -r Debug
 	$(RM) -r CodeblocksDebug
