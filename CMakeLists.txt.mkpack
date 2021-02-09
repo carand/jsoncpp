@@ -49,7 +49,7 @@ set(CPACK_GENERATOR "DEB")
 ################################################################################
 ### source generators
 ################################################################################
-set(CPACK_SOURCE_GENERATOR "TGZ")
+# set(CPACK_SOURCE_GENERATOR "TGZ")
 
 ################################################################################
 ### debian package specific stuff
@@ -72,7 +72,7 @@ set (CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 
 # if (${CPACK_GENERATOR} STREQUAL "TGZ")
 
-#     set(CPACK_SET_DESTDIR OFF)
+set(CPACK_SET_DESTDIR OFF)
 #     set(CMAKE_INSTALL_RPATH ".")
 #     set_target_properties(${APP_NAME}
 #         PROPERTIES INSTALL_RPATH ".")
