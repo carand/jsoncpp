@@ -23,7 +23,6 @@ APP_TEST=unittests_$(APP_NAME)
 
 MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MKFILE_DIR := $(dir $(MKFILE_PATH))
-SPELLGEN=./support/generateSpellingListFromCTags.py
 SPELLFILE=$(APP_NAME)FromTags
 # TEST_APP_NAME=rfidTestApp
 CMAKE_TEST_APP_DIR= $(CMAKE_BUILD_DIR)
@@ -90,7 +89,7 @@ $(APP_NAME): | $(CMAKE_BUILD_DIR)
 ##
 
 .PHONY: clean
-clean: clean_spell
+clean:
 	$(RM) -fr tags
 	$(RM) -fr cscope.out
 	test -d $(CMAKE_BUILD_DIR) && $(MAKE) -sC $(CMAKE_BUILD_DIR) clean $(ARGS); cd ..
@@ -152,12 +151,6 @@ tags: | $(CMAKE_BUILD_DIR)
 	@($(MAKE) -C $(CMAKE_BUILD_DIR) tags)
 	@( $(MAKE) rtags)
 
-genspell: docs tags | $(CMAKE_BUILD_DIR)
-	 python $(SPELLGEN) -o ~/.vim/spell -t tags -i $(CMAKE_BUILD_DIR)/doc/xml/index.xml $(SPELLFILE)
-
-.PHONY: clean_spell
-clean_spell:
-	python2 $(SPELLGEN) -o ~/.vim/spell --clear $(SPELLFILE)
 
 pack:
 	@($(MAKE) -C $(CMAKE_BUILD_DIR) package)
