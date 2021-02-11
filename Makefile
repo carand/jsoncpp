@@ -90,10 +90,10 @@ $(APP_NAME): | $(CMAKE_BUILD_DIR)
 ##
 
 .PHONY: clean
-clean:
-	$(RM) -r tags
-	$(RM) -r cscope.out
-	cd $(CMAKE_BUILD_DIR) &&  $(MAKE) clean $(ARGS); cd ..
+clean: clean_spell
+	$(RM) -fr tags
+	$(RM) -fr cscope.out
+	test -d $(CMAKE_BUILD_DIR) && $(MAKE) -sC $(CMAKE_BUILD_DIR) clean $(ARGS); cd ..
 	# $(MAKE) -C $(CMAKE_BUILD_DIR) clean
 
 $(APP_TEST): | $(CMAKE_BUILD_DIR)
@@ -125,7 +125,7 @@ install_package: | $(APP_NAME)
 	cd $(CMAKE_BUILD_DIR) && $(MAKE) package &&  cp *.deb $(RELEASE_DIR) && cd ..
 	cd $(CMAKE_BUILD_DIR) && $(MAKE) package_source &&  cp *-Source.tar.gz $(RELEASE_DIR) && cd ..
 
-install_release: release
+install_release: distclean release
 	mkdir -p $(RELEASE_DIR)
 	cd Release && $(MAKE) install && cd ..
 
@@ -157,7 +157,7 @@ genspell: docs tags | $(CMAKE_BUILD_DIR)
 
 .PHONY: clean_spell
 clean_spell:
-	python $(SPELLGEN) -o ~/.vim/spell --clear $(SPELLFILE)
+	python2 $(SPELLGEN) -o ~/.vim/spell --clear $(SPELLFILE)
 
 pack:
 	@($(MAKE) -C $(CMAKE_BUILD_DIR) package)
@@ -169,13 +169,14 @@ rtags: compile_commands
 .PHONY: distclean
 distclean:  clean
 	$(RM) -fr $(RELEASE_DIR)
-	$(RM) -r Release
-	$(RM) -r Debug
-	$(RM) -r CodeblocksDebug
-	$(RM) -r CodeblocksRelease
-	$(RM) tags
-	$(RM) cscope.out
-	$(RM) cscope.out.*
-	$(RM) *.orig
-	$(RM) ncscope.out.*
+	$(RM) -fr $(CMAKE_BUILD_DIR)
+	$(RM) -fr Release
+	$(RM) -fr Debug
+	$(RM) -fr CodeblocksDebug
+	$(RM) -fr CodeblocksRelease
+	$(RM) -f tags
+	$(RM) -f cscope.out
+	$(RM) -f cscope.out.*
+	$(RM) -f *.orig
+	$(RM) -f ncscope.out.*
 
