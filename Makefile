@@ -120,7 +120,7 @@ $(compile_commands): $(APP_NAME) | $(CMAKE_BUILD_DIR)
 	$(MAKE) -C $(CMAKE_BUILD_DIR) $(APP_NAME)
 
 
-install_package: | $(APP_NAME)
+install_package: distclean | $(APP_NAME)
 	mkdir -p $(RELEASE_DIR)
 	cd $(CMAKE_BUILD_DIR) && $(MAKE) package &&  cp *.deb $(RELEASE_DIR) && cd ..
 	cd $(CMAKE_BUILD_DIR) && $(MAKE) package_source &&  cp *-Source.tar.gz $(RELEASE_DIR) && cd ..
