@@ -72,10 +72,23 @@ project(jsoncpp
     VERSION 1.9.4 # <major>[.<minor>[.<patch>[.<tweak>]]]
     LANGUAGES CXX)
 
+# For Debuging the Makefile
+set( CMAKE_VERBOSE_MAKEFILE ON )
+
+# output compiler flags
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED OFF)
+
+set_target_properties(
+    ${APP_NAME} PROPERTIES DEBUG_POSTFIX "d")
+
+set(APP_C_FLAGS "-Wall -Wextra" )
 message(STATUS "JsonCpp Version: ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 set(PROJECT_SOVERSION 24)
 
 include (CMakeLists.txt.option)
+include (CMakeLists.txt.dralle)
 option(JSONCPP_WITH_TESTS "Compile and (for jsoncpp_check) run JsonCpp test executables" ON)
 option(JSONCPP_WITH_POST_BUILD_UNITTEST "Automatically run unit-tests as a post build step" ON)
 option(JSONCPP_WITH_WARNING_AS_ERROR "Force compilation to fail if a warning occurs" OFF)
@@ -178,12 +191,33 @@ if(JSONCPP_WITH_CMAKE_PACKAGE)
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/jsoncpp)
 endif()
 
+
+
+# use, i.e. don't skip the full RPATH for the build tree
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+
+# when building, don't use the install RPATH already
+# (but later on when installing)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+
+# add the automatically determined parts of the RPATH
+# which point to directories outside the build tree to the install RPATH
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+# the RPATH to be used when installing, but only if it's not a system directory
+list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
+if("${isSystemDir}" STREQUAL "-1")
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+endif("${isSystemDir}" STREQUAL "-1")
+
+
 if(JSONCPP_WITH_TESTS)
     enable_testing()
     include(CTest)
 endif()
 
-include (CMakeLists.txt.dralle)
 # Build the different applications
 add_subdirectory(src)
 
