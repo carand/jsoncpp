@@ -77,6 +77,10 @@ package_src:  | $(CMAKE_BUILD_DIR)
 package_deb: | $(CMAKE_BUILD_DIR)
 	$(MAKE) -C $(CMAKE_BUILD_DIR) package
 
+
+install:
+	sudo dpkg -i $(CMAKE_BUILD_DIR)/$(PACKAGE_NAME)*.deb
+
 $(compile_commands) : $(APP_NAME)
 
 rtags: $(compile_commands)
