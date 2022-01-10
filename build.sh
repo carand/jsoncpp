@@ -9,4 +9,4 @@ cd ${builddir} || exit
 
 cmake ${options} ..
 make
-# sudo make install
+sudo make install

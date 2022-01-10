@@ -130,6 +130,7 @@ install_release: distclean release
 
 install_global:|
 	$(MAKE) $(APP_NAME)
+	echo "installing jsoncpp ...."
 	cd ${CMAKE_BUILD_DIR} && sudo $(MAKE) install && cd ..
 
 
