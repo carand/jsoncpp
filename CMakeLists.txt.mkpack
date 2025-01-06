@@ -83,6 +83,6 @@ set(CPACK_SET_DESTDIR OFF)
 # PROPERTIES INSTALL_RPATH "/usr/local/${APP_NAME}")
 # endif ()
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA
-    "${CMAKE_SOURCE_DIR}/postinstall.sh")
+    "${CMAKE_SOURCE_DIR}/debian/postinst")
 
 include(CPack)
